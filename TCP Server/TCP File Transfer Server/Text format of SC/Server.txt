@@ -1,0 +1,58 @@
+import java.util.*; 
+import java.io.FileInputStream; 
+import java.io.BufferedInputStream; 
+import java.net.InetAddress;
+import java.net.ServerSocket; 
+import java.net.Socket;
+import java.io.File;
+import java.io.OutputStream; 
+
+
+public class Server 
+{
+public static void main(String[] args) throws Exception 
+
+{
+// Initialization of  Sockets
+ServerSocket sock = new ServerSocket(5001); 
+Socket socket = sock.accept();
+
+//The InetAddress specification
+InetAddress IA = InetAddress.getByName("localhost");
+
+//File Provision
+Scanner sc= new Scanner(System.in);
+System.out.print("Enter the path of file to be transferred : \n"); 
+String str= sc.nextLine();   
+File file = new File(str); 
+FileInputStream fis = new FileInputStream(file);
+BufferedInputStream bis = new BufferedInputStream(fis); 
+
+//Get socket's output stream
+OutputStream os = socket.getOutputStream();
+
+//Copy file Contents into  array 
+byte[] contents;
+long fileLength = file.length(); 
+long current = 0;
+long start = System.nanoTime(); 
+while(current!=fileLength){
+int size = 10000;
+if(fileLength - current >= size)
+current += size; else
+{
+size = (int)(fileLength - current); 
+current = fileLength;
+}
+contents = new byte[size];
+bis.read(contents, 0, size); 
+os.write(contents);
+} 
+os.flush();
+
+//Closing of socket connection
+socket.close();
+sock.close();
+System.out.println("File sent");
+}
+}
